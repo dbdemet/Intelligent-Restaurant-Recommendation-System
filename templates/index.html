@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kahramanmaraş Restoran Önerici</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .main-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            margin: 2rem auto;
+            padding: 2rem;
+            max-width: 1200px;
+        }
+
+        .search-box {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        .search-input {
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 1rem 1.5rem;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+
+        .search-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 10px;
+            padding: 1rem 2rem;
+            color: white;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .search-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .restaurant-card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            border-left: 4px solid #667eea;
+        }
+
+        .restaurant-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .rating {
+            color: #ffc107;
+            font-size: 1.2rem;
+        }
+
+        .food-types {
+            background: #f8f9fa;
+            border-radius: 20px;
+            padding: 0.5rem 1rem;
+            margin: 0.5rem 0.5rem 0.5rem 0;
+            display: inline-block;
+            font-size: 0.9rem;
+            color: #495057;
+        }
+
+        .score-badge {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .category-badge {
+            background: #e9ecef;
+            color: #495057;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            margin: 0.25rem;
+            display: inline-block;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .category-badge:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 3rem;
+            color: #6c757d;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container-fluid">
+        <div class="main-container">
+            <div class="text-center mb-4">
+                <h1 class="display-4 fw-bold text-primary">
+                    <i class="fas fa-utensils"></i> Kahramanmaraş Restoran Önerici
+                </h1>
+                <p class="lead text-muted">Yemek türü veya restoran adı yazarak size en uygun restoranları bulun</p>
+            </div>
+
+            <div class="search-box">
+                <div class="row">
+                    <div class="col-md-8">
+                        <input type="text" id="searchInput" class="form-control search-input"
+                            placeholder="Örn: kebap, dondurma, pasta, mado, kervan..." autocomplete="off">
+                    </div>
+                    <div class="col-md-4">
+                        <button id="searchBtn" class="btn search-btn w-100">
+                            <i class="fas fa-search"></i> Ara
+                        </button>
+                    </div>
+                </div>
+
+                <div class="mt-3">
+                    <h6 class="text-muted mb-2">Popüler Kategoriler:</h6>
+                    <div id="categories"></div>
+                </div>
+            </div>
+
+            <div id="results">
+                <div class="text-center text-muted">
+                    <i class="fas fa-search fa-3x mb-3"></i>
+                    <p>Arama yapmak için yukarıdaki kutuya yazın</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Kategorileri yükle
+        fetch('/categories')
+            .then(response => response.json())
+            .then(data => {
+                const categoriesDiv = document.getElementById('categories');
+                data.categories.slice(0, 10).forEach(category => {
+                    const badge = document.createElement('span');
+                    badge.className = 'category-badge';
+                    badge.textContent = `${category.name} (${category.count})`;
+                    badge.onclick = () => {
+                        document.getElementById('searchInput').value = category.name;
+                        search();
+                    };
+                    categoriesDiv.appendChild(badge);
+                });
+            });
+
+        // Arama fonksiyonu
+        function search() {
+            const query = document.getElementById('searchInput').value.trim();
+            if (!query) return;
+
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = `
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p class="mt-2">Aranıyor...</p>
+                </div>
+            `;
+
+            fetch('/search', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ query: query })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    displayResults(data.recommendations, query);
+                })
+                .catch(error => {
+                    resultsDiv.innerHTML = `
+                    <div class="no-results">
+                        <i class="fas fa-exclamation-triangle fa-3x text-warning mb-3"></i>
+                        <p>Arama sırasında bir hata oluştu. Lütfen tekrar deneyin.</p>
+                    </div>
+                `;
+                });
+        }
+
+        // Sonuçları göster
+        function displayResults(recommendations, query) {
+            const resultsDiv = document.getElementById('results');
+
+            if (recommendations.length === 0) {
+                resultsDiv.innerHTML = `
+                    <div class="no-results">
+                        <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                        <h4>"${query}" için sonuç bulunamadı</h4>
+                        <p>Farklı bir arama terimi deneyin veya yukarıdaki kategorilerden birini seçin.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = `
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h4><i class="fas fa-list"></i> "${query}" için ${recommendations.length} sonuç bulundu</h4>
+                </div>
+            `;
+
+            recommendations.forEach((restaurant, index) => {
+                const ratingStars = '★'.repeat(Math.floor(restaurant.rating)) + '☆'.repeat(5 - Math.floor(restaurant.rating));
+                const foodTypesHtml = restaurant.food_types.map(type =>
+                    `<span class="food-types">${type}</span>`
+                ).join('');
+
+                html += `
+                    <div class="restaurant-card">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <h5 class="fw-bold text-primary">${index + 1}. ${restaurant.restaurant_name}</h5>
+                                <div class="mb-2">
+                                    <span class="rating">${ratingStars}</span>
+                                    <span class="text-muted ms-2">${restaurant.rating.toFixed(1)}/5.0</span>
+                                    <span class="text-muted ms-3"><i class="fas fa-comments"></i> ${restaurant.review_count} yorum</span>
+                                </div>
+                                <div class="mb-2">
+                                    ${foodTypesHtml}
+                                </div>
+                            </div>
+                            <div class="col-md-4 text-end">
+                                <div class="score-badge mb-2">
+                                    Skor: ${restaurant.final_score.toFixed(3)}
+                                </div>
+                                <a href="${restaurant.url}" target="_blank" class="btn btn-outline-primary btn-sm">
+                                    <i class="fas fa-external-link-alt"></i> Detaylar
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            resultsDiv.innerHTML = html;
+        }
+
+        // Event listeners
+        document.getElementById('searchBtn').addEventListener('click', search);
+        document.getElementById('searchInput').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                search();
+            }
+        });
+
+        // Otomatik arama için debounce
+        let searchTimeout;
+        document.getElementById('searchInput').addEventListener('input', function () {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                if (this.value.trim().length >= 2) {
+                    search();
+                }
+            }, 500);
+        });
+    </script>
+</body>
+
+</html>
